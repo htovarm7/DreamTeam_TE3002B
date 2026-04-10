@@ -360,10 +360,6 @@ def build_feature_matrix(images):
     return np.array(feats)
 
 
-# ─────────────────────────────────────────────────────────────
-# 4. EVALUATION HELPERS
-# ─────────────────────────────────────────────────────────────
-
 def evaluate(y_true, y_pred, name="Model"):
     acc  = accuracy_score(y_true, y_pred)
     prec = precision_score(y_true, y_pred, zero_division=0)
@@ -384,11 +380,6 @@ def evaluate(y_true, y_pred, name="Model"):
     print(classification_report(y_true, y_pred,
                                  target_names=['Left(0)', 'Right(1)']))
     return acc, prec, rec, f1, cm
-
-
-# ─────────────────────────────────────────────────────────────
-# 5. VISUALIZATIONS
-# ─────────────────────────────────────────────────────────────
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -505,11 +496,6 @@ def plot_feature_importance(model_scratch):
     plt.close()
     print("  [saved] feature_weights.png")
 
-
-# ─────────────────────────────────────────────────────────────
-# 6. SINGLE-IMAGE INFERENCE
-# ─────────────────────────────────────────────────────────────
-
 def predict_single(img_bgr, model, scaler):
     """
     Predict direction for one BGR image.
@@ -524,41 +510,32 @@ def predict_single(img_bgr, model, scaler):
 
 
 def _draw_overlay(frame, label, prob, roi=None):
-    """Render prediction label + confidence bar onto frame in-place."""
-    h_f = frame.shape[0]
-
+    """Render prediction label + confidence bar onto frame in-place (minimalist)."""
     # Optional ROI rectangle
     if roi is not None:
         x, y, w, rh = roi
         cv2.rectangle(frame, (x, y), (x + w, y + rh), (0, 220, 220), 2)
-        cv2.putText(frame, 'ROI', (x + 4, y - 6),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 220, 220), 1)
 
     color = (0, 210, 0) if label == 'RIGHT' else (60, 80, 255)
     arrow = '->' if label == 'RIGHT' else '<-'
 
     # Dark backing panel
-    cv2.rectangle(frame, (8, 8), (360, 120), (20, 20, 20), -1)
-    cv2.rectangle(frame, (8, 8), (360, 120), color, 1)
+    cv2.rectangle(frame, (8, 8), (220, 80), (20, 20, 20), -1)
+    cv2.rectangle(frame, (8, 8), (220, 80), color, 1)
 
     # Label
-    cv2.putText(frame, f'{arrow}  {label}', (18, 62),
-                cv2.FONT_HERSHEY_DUPLEX, 1.6, color, 2, cv2.LINE_AA)
+    cv2.putText(frame, f'{arrow}  {label}', (16, 48),
+                cv2.FONT_HERSHEY_DUPLEX, 1.3, color, 2, cv2.LINE_AA)
 
-    # Probability bar  (left = red side, right = green side)
-    bar_x, bar_y, bar_w, bar_h = 18, 78, 330, 14
+    # Probability bar
+    bar_x, bar_y, bar_w, bar_h = 16, 58, 190, 12
     cv2.rectangle(frame, (bar_x, bar_y),
                   (bar_x + bar_w, bar_y + bar_h), (60, 60, 200), -1)
     fill = int(prob * bar_w)
     cv2.rectangle(frame, (bar_x, bar_y),
                   (bar_x + fill, bar_y + bar_h), (0, 210, 0), -1)
-    cv2.putText(frame, f'P(right)={prob:.2f}', (bar_x, bar_y + bar_h + 14),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.48, (180, 180, 180), 1)
-
-    # Instructions
-    cv2.putText(frame, 'q=quit  n=next  p=prev  r=random',
-                (8, h_f - 8), cv2.FONT_HERSHEY_SIMPLEX,
-                0.42, (120, 120, 120), 1)
+    cv2.putText(frame, f'{prob:.2f}', (bar_x + bar_w + 6, bar_y + 10),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.38, (180, 180, 180), 1)
 
 def run_camera(model, scaler):
     """
@@ -582,8 +559,8 @@ def run_camera(model, scaler):
 
         fh, fw = frame.shape[:2]
 
-        # Define a centered square ROI (40 % of frame height)
-        roi_size = int(min(fh, fw) * 0.40)
+        # Define a centered square ROI (55 % of frame height)
+        roi_size = int(min(fh, fw) * 0.55)
         rx = (fw - roi_size) // 2
         ry = (fh - roi_size) // 2
         roi = (rx, ry, roi_size, roi_size)
