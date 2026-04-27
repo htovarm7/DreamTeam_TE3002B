@@ -1,0 +1,1 @@
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/src/so_arm100_pick_place/so_arm100_pick_place/pick_place_node.py

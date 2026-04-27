@@ -1,0 +1,19 @@
+cmake_minimum_required(VERSION 3.8)
+project(so_arm100_pick_place)
+
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+
+ament_python_install_package(${PROJECT_NAME})
+
+install(PROGRAMS
+  so_arm100_pick_place/pick_place_node.py
+  so_arm100_pick_place/vision_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY launch config
+  DESTINATION share/${PROJECT_NAME}
+)
+
+ament_package()

@@ -1,0 +1,1 @@
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/src/so_arm100_moveit_config/launch/move_group.launch.py

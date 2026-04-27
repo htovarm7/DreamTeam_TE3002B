@@ -1,0 +1,46 @@
+[0.010s] Invoking command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/src/so_arm100_description -DCMAKE_BUILD_TYPE=Release -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description
+[0.288s] -- The C compiler identification is GNU 11.4.0
+[0.480s] -- The CXX compiler identification is GNU 11.4.0
+[0.502s] -- Detecting C compiler ABI info
+[0.587s] -- Detecting C compiler ABI info - done
+[0.593s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.593s] -- Detecting C compile features
+[0.594s] -- Detecting C compile features - done
+[0.598s] -- Detecting CXX compiler ABI info
+[0.671s] -- Detecting CXX compiler ABI info - done
+[0.680s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.680s] -- Detecting CXX compile features
+[0.681s] -- Detecting CXX compile features - done
+[0.693s] -- Found ament_cmake: 1.3.13 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.834s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.875s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.975s] -- Configuring done
+[0.976s] -- Generating done
+[0.977s] -- Build files have been written to: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description
+[0.981s] Invoked command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/src/so_arm100_description -DCMAKE_BUILD_TYPE=Release -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description
+[0.981s] Invoking command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description -- -j32 -l32
+[1.008s] Invoked command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --build /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description -- -j32 -l32
+[1.015s] Invoking command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description
+[1.022s] -- Install configuration: "Release"
+[1.022s] -- Execute custom install script
+[1.023s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/urdf/so_arm100.gazebo.xacro
+[1.029s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/urdf/so_arm100.ros2_control.xacro
+[1.035s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/urdf/so_arm100.urdf.xacro
+[1.040s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/launch/display.launch.py
+[1.045s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/rviz/so_arm100.rviz
+[1.052s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/ament_index/resource_index/package_run_dependencies/so_arm100_description
+[1.059s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/ament_index/resource_index/parent_prefix_path/so_arm100_description
+[1.065s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/environment/ament_prefix_path.sh
+[1.070s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/environment/ament_prefix_path.dsv
+[1.075s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/environment/path.sh
+[1.086s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/environment/path.dsv
+[1.094s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/local_setup.bash
+[1.105s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/local_setup.sh
+[1.114s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/local_setup.zsh
+[1.124s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/local_setup.dsv
+[1.135s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/package.dsv
+[1.150s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/ament_index/resource_index/packages/so_arm100_description
+[1.158s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/cmake/so_arm100_descriptionConfig.cmake
+[1.163s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/cmake/so_arm100_descriptionConfig-version.cmake
+[1.168s] -- Symlinking: /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/install/so_arm100_description/share/so_arm100_description/package.xml
+[1.175s] Invoked command in '/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description' returned '0': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake --install /home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_description

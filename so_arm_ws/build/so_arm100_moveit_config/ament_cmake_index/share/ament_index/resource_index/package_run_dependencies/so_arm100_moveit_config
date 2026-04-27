@@ -1,0 +1,1 @@
+moveit_ros_move_group;moveit_ros_planning_interface;moveit_ros_visualization;moveit_kinematics;so_arm100_description;joint_state_broadcaster;joint_trajectory_controller

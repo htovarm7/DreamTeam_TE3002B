@@ -1,0 +1,8 @@
+setup.py
+so_arm100_pick_place/__init__.py
+so_arm100_pick_place/pick_place_node.py
+so_arm100_pick_place/vision_node.py
+so_arm100_pick_place.egg-info/PKG-INFO
+so_arm100_pick_place.egg-info/SOURCES.txt
+so_arm100_pick_place.egg-info/dependency_links.txt
+so_arm100_pick_place.egg-info/top_level.txt

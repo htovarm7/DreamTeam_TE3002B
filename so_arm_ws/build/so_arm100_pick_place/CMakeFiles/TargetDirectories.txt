@@ -1,0 +1,11 @@
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/uninstall.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/so_arm100_pick_place_uninstall.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/ament_cmake_python_symlink_so_arm100_pick_place.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/ament_cmake_python_build_so_arm100_pick_place_egg.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/test.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/edit_cache.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/rebuild_cache.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/list_install_components.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/install.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/install/local.dir
+/home/hector/Desktop/DreamTeam_TE3002B/so_arm_ws/build/so_arm100_pick_place/CMakeFiles/install/strip.dir
