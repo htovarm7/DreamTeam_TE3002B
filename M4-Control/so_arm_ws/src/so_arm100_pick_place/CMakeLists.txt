@@ -9,6 +9,7 @@ ament_python_install_package(${PROJECT_NAME})
 install(PROGRAMS
   so_arm100_pick_place/pick_place_node.py
   so_arm100_pick_place/vision_node.py
+  so_arm100_pick_place/joint_commander.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

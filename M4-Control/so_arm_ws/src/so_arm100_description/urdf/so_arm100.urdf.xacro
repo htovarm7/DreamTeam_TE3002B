@@ -8,8 +8,6 @@
        All dimensions in metres, masses in kg.
   ======================================================== -->
 
-  <xacro:property name="pi" value="3.14159265"/>
-
   <!-- Gazebo / ros2_control plugin -->
   <xacro:include filename="$(find so_arm100_description)/urdf/so_arm100.gazebo.xacro"/>
   <xacro:include filename="$(find so_arm100_description)/urdf/so_arm100.ros2_control.xacro"/>
