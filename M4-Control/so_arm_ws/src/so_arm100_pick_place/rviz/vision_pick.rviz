@@ -1,0 +1,141 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /RobotModel1
+        - /MarkerArray1
+        - /Image1
+        - /Image2
+      Splitter Ratio: 0.5
+    Tree Height: 557
+  - Class: rviz_common/Views
+    Name: Views
+
+Visualization Manager:
+  Class: ""
+  Displays:
+    # ── Grid ──────────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 0.1
+      Color: 160; 160; 164
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 20
+      Reference Frame: world
+
+    # ── Robot Model ────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Topic: /robot_description
+      Visual Enabled: true
+      Collision Enabled: false
+      Alpha: 0.8
+
+    # ── TF ─────────────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: false
+      Marker Scale: 0.3
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+
+    # ── Detected object markers (spheres + labels + arrows) ───────────────────
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Detections
+      Enabled: true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /vision/markers
+      Namespaces:
+        objects: true
+        labels: true
+        approach: true
+
+    # ── Best object pose (big green arrow) ────────────────────────────────────
+    - Class: rviz_default_plugins/PoseStamped
+      Name: BestObject
+      Enabled: true
+      Topic:
+        Value: /vision/best_object
+      Shape: Arrow
+      Color: 0; 220; 0
+      Arrow Length: 0.15
+
+    # ── RGB camera image ──────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Name: RGB Camera
+      Enabled: true
+      Topic:
+        Depth: 2
+        Reliability Policy: Best Effort
+        Value: /camera/color/image_raw
+      Queue Size: 2
+
+    # ── Debug image (detections overlaid) ─────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Name: Debug Vision
+      Enabled: true
+      Topic:
+        Depth: 2
+        Reliability Policy: Best Effort
+        Value: /vision/debug_image
+      Queue Size: 2
+
+    # ── Depth image ────────────────────────────────────────────────────────────
+    - Class: rviz_default_plugins/Image
+      Name: Depth
+      Enabled: true
+      Topic:
+        Depth: 2
+        Reliability Policy: Best Effort
+        Value: /camera/aligned_depth/image_raw
+      Queue Size: 2
+
+  Global Options:
+    Background Color: 30; 30; 30
+    Fixed Frame: world
+    Frame Rate: 30
+
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.4
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.06
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: 0.2
+        Y: 0
+        Z: 0.3
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.01
+      Pitch: 0.45
+      Target Frame: world
+      Value: Orbit (rviz)
+      Yaw: 0.85

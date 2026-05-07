@@ -10,10 +10,14 @@ install(PROGRAMS
   so_arm100_pick_place/pick_place_node.py
   so_arm100_pick_place/vision_node.py
   so_arm100_pick_place/joint_commander.py
+  so_arm100_pick_place/realsense_node.py
+  so_arm100_pick_place/vision_detector.py
+  so_arm100_pick_place/move_physical.py
+  so_arm100_pick_place/teach_poses.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch config
+install(DIRECTORY launch config rviz
   DESTINATION share/${PROJECT_NAME}
 )
 
