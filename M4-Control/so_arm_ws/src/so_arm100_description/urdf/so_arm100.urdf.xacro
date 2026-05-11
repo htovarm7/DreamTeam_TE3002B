@@ -1,9 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="so_arm100">
 
-  <!-- Gazebo / ros2_control plugins -->
-  <xacro:include filename="$(find so_arm100_description)/urdf/so_arm100.gazebo.xacro"/>
+  <!-- ros2_control hardware/sim interface -->
+  <xacro:arg name="use_sim" default="false"/>
   <xacro:include filename="$(find so_arm100_description)/urdf/so_arm100.ros2_control.xacro"/>
+
+  <!-- Gazebo-only plugins (materials + camera sim) -->
+  <xacro:if value="$(arg use_sim)">
+    <xacro:include filename="$(find so_arm100_description)/urdf/so_arm100.gazebo.xacro"/>
+  </xacro:if>
 
   <xacro:property name="mesh_pkg" value="package://so_arm100_description/meshes"/>
 

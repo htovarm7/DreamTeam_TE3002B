@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.10)
 project(so_arm100_pick_place)
 
 find_package(ament_cmake REQUIRED)
@@ -8,7 +8,6 @@ ament_python_install_package(${PROJECT_NAME})
 
 install(PROGRAMS
   so_arm100_pick_place/pick_place_node.py
-  so_arm100_pick_place/vision_node.py
   so_arm100_pick_place/joint_commander.py
   so_arm100_pick_place/realsense_node.py
   so_arm100_pick_place/vision_detector.py
