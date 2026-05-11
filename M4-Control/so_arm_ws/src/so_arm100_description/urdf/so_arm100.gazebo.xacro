@@ -10,6 +10,15 @@
   <gazebo reference="gripper_link">   <material>Gazebo/DarkGrey</material></gazebo>
   <gazebo reference="moving_jaw_link"><material>Gazebo/Yellow</material></gazebo>
 
+  <!-- ros2_control / controller_manager plugin -->
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find so_arm100_gazebo)/config/ros2_controllers.yaml</parameters>
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+    </plugin>
+  </gazebo>
+
   <!-- ZED2 camera plugin (simulated stereo + depth) -->
   <gazebo reference="zed2_left_camera_frame">
     <sensor name="zed2_camera" type="depth">

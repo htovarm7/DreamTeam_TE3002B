@@ -17,7 +17,7 @@
 
   <!-- End-effector declaration -->
   <end_effector name="gripper_eef"
-                parent_link="tcp"
+                parent_link="gripper_link"
                 group="gripper"
                 parent_group="arm"/>
 
