@@ -67,15 +67,22 @@ Visualization Manager:
         labels: true
         approach: true
 
-    # ── Best object pose (big green arrow) ────────────────────────────────────
-    - Class: rviz_default_plugins/PoseStamped
+    # ── Best object pose (green arrow) ────────────────────────────────────────
+    - Class: rviz_default_plugins/Pose
       Name: BestObject
       Enabled: true
       Topic:
+        Depth: 2
+        Reliability Policy: Best Effort
         Value: /vision/best_object
       Shape: Arrow
       Color: 0; 220; 0
-      Arrow Length: 0.15
+      Axes Length: 0.1
+      Axes Radius: 0.01
+      Head Length: 0.05
+      Head Radius: 0.02
+      Shaft Length: 0.1
+      Shaft Radius: 0.01
 
     # ── RGB camera image ──────────────────────────────────────────────────────
     - Class: rviz_default_plugins/Image

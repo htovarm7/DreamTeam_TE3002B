@@ -2,16 +2,12 @@
 """
 pick_place_node.py
 ──────────────────
-State-machine pick-and-place for SO-ARM100 using MoveIt2 Python API.
+State-machine pick-and-place para SO-ARM100 — compatible con ROS2 Humble.
+Usa /compute_ik (MoveIt2 service) + FollowJointTrajectory (ros2_control).
 
-States:
-  IDLE → MOVE_HOME → OPEN_GRIPPER → DETECT_OBJECT
-       → MOVE_PRE_GRASP → MOVE_GRASP → CLOSE_GRIPPER
-       → MOVE_POST_GRASP → MOVE_PLACE → OPEN_GRIPPER
-       → MOVE_HOME → IDLE  (loop)
-
-Object pose comes from /vision/object_position (PointStamped in camera frame).
-TF is used to transform that point into the 'world' frame before planning.
+States: IDLE → HOME → OPEN_GRIPPER → DETECT
+      → PRE_GRASP → GRASP → CLOSE_GRIPPER
+      → POST_GRASP → PLACE → OPEN_GRIPPER → HOME (loop)
 """
 
 import math
@@ -24,31 +20,26 @@ from rclpy.duration import Duration
 
 from geometry_msgs.msg import PointStamped, PoseStamped, Quaternion
 from std_msgs.msg import String
-from control_msgs.action import FollowJointTrajectory
+from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+from builtin_interfaces.msg import Duration as RosDuration
+from control_msgs.action import FollowJointTrajectory
+from moveit_msgs.srv import GetPositionIK
+from moveit_msgs.msg import PositionIKRequest, RobotState
 
 import tf2_ros
-import tf2_geometry_msgs  # noqa: F401 – registers PointStamped transform
-
-# MoveIt2 Python bindings
-from moveit.planning import MoveItPy
-from moveit.core.robot_state import RobotState
+import tf2_geometry_msgs  # noqa: F401
 
 
-# ── helpers ──────────────────────────────────────────────────────────────────
+ARM_JOINTS     = ["shoulder_pan", "shoulder_lift", "elbow_flex", "wrist_flex", "wrist_roll"]
+GRIPPER_JOINTS = ["gripper"]
 
-def make_pose(x, y, z, qx=0.0, qy=0.0, qz=0.0, qw=1.0, frame="world") -> PoseStamped:
-    ps = PoseStamped()
-    ps.header.frame_id = frame
-    ps.pose.position.x = x
-    ps.pose.position.y = y
-    ps.pose.position.z = z
-    ps.pose.orientation = Quaternion(x=qx, y=qy, z=qz, w=qw)
-    return ps
+PRE_GRASP_Z = 0.10
+GRASP_Z     = 0.02
+PLACE_XYZ   = (0.30, -0.15, 0.12)
 
 
-def euler_to_quat(roll: float, pitch: float, yaw: float) -> Quaternion:
-    """ZYX Euler → quaternion."""
+def _euler_to_quat(roll, pitch, yaw) -> Quaternion:
     cr, sr = math.cos(roll / 2),  math.sin(roll / 2)
     cp, sp = math.cos(pitch / 2), math.sin(pitch / 2)
     cy, sy = math.cos(yaw / 2),   math.sin(yaw / 2)
@@ -60,188 +51,214 @@ def euler_to_quat(roll: float, pitch: float, yaw: float) -> Quaternion:
     )
 
 
-# ── State machine ─────────────────────────────────────────────────────────────
-
 class State:
-    IDLE            = "IDLE"
-    MOVE_HOME       = "MOVE_HOME"
-    OPEN_GRIPPER    = "OPEN_GRIPPER"
-    DETECT_OBJECT   = "DETECT_OBJECT"
-    MOVE_PRE_GRASP  = "MOVE_PRE_GRASP"
-    MOVE_GRASP      = "MOVE_GRASP"
-    CLOSE_GRIPPER   = "CLOSE_GRIPPER"
-    MOVE_POST_GRASP = "MOVE_POST_GRASP"
-    MOVE_PLACE      = "MOVE_PLACE"
-    DONE            = "DONE"
+    IDLE         = "IDLE"
+    HOME         = "HOME"
+    OPEN_GRIPPER = "OPEN_GRIPPER"
+    DETECT       = "DETECT"
+    PRE_GRASP    = "PRE_GRASP"
+    GRASP        = "GRASP"
+    CLOSE_GRIP   = "CLOSE_GRIP"
+    POST_GRASP   = "POST_GRASP"
+    PLACE        = "PLACE"
+    DONE         = "DONE"
 
 
 class PickPlaceNode(Node):
-    # Fixed place pose in world frame (blue pad in world)
-    PLACE_POSE = make_pose(0.30, -0.15, 0.12,
-                           **vars(euler_to_quat(0, math.pi / 2, 0).__class__
-                                  .__new__(Quaternion).__dict__))
-
-    # We rebuild PLACE_POSE properly:
-    _PLACE_XYZ = (0.30, -0.15, 0.12)
-    _PLACE_RPY = (0.0, math.pi / 2, 0.0)
-
-    # Pre-grasp offset above the object (metres)
-    PRE_GRASP_Z_OFFSET = 0.10
-    # Grasp offset – TCP touches the top of the cube (cube = 4 cm, half = 2 cm)
-    GRASP_Z_OFFSET     = 0.02
 
     def __init__(self):
         super().__init__("pick_place_node")
 
-        # ── MoveIt2 ────────────────────────────────────────────────────────
-        self.moveit = MoveItPy(node_name="pick_place_moveit")
-        self.arm     = self.moveit.get_planning_component("arm")
-        self.gripper = self.moveit.get_planning_component("gripper")
+        self._tf_buf = tf2_ros.Buffer()
+        self._tf_lst = tf2_ros.TransformListener(self._tf_buf, self)
 
-        # ── TF ─────────────────────────────────────────────────────────────
-        self.tf_buffer   = tf2_ros.Buffer()
-        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+        self._arm_client  = ActionClient(
+            self, FollowJointTrajectory, "/arm_controller/follow_joint_trajectory"
+        )
+        self._grip_client = ActionClient(
+            self, FollowJointTrajectory, "/gripper_controller/follow_joint_trajectory"
+        )
+        self._ik_cli = self.create_client(GetPositionIK, "/compute_ik")
 
-        # ── State machine ──────────────────────────────────────────────────
-        self.state        = State.IDLE
-        self.object_world: PointStamped | None = None   # object in world frame
+        self._js: JointState | None          = None
+        self._object_world: PointStamped | None = None
+        self._state  = State.IDLE
+        self._busy   = False
 
-        # ── Subscriptions / publishers ─────────────────────────────────────
-        self.create_subscription(PointStamped, "/vision/object_position",
+        self.create_subscription(PointStamped, "/vision/best_object",
                                  self._object_cb, 10)
-        self.status_pub = self.create_publisher(String, "/pick_place/status", 10)
+        self.create_subscription(JointState, "/joint_states", self._js_cb, 10)
+        self._status_pub = self.create_publisher(String, "/pick_place/status", 10)
 
-        # ── Timer: state machine tick at 2 Hz ─────────────────────────────
         self.create_timer(0.5, self._tick)
+        self.get_logger().info("PickPlaceNode ready (Humble, IK+trajectory).")
 
-        self.get_logger().info("PickPlaceNode ready.")
+    # ── Callbacks ─────────────────────────────────────────────────────────────
 
-    # ── Vision callback ───────────────────────────────────────────────────────
+    def _js_cb(self, msg: JointState):
+        self._js = msg
 
     def _object_cb(self, msg: PointStamped):
-        """Transform detected point from camera frame → world frame."""
         try:
-            self.object_world = self.tf_buffer.transform(
+            self._object_world = self._tf_buf.transform(
                 msg, "world", timeout=Duration(seconds=0.1)
             )
         except Exception as e:
-            self.get_logger().warn(f"TF transform failed: {e}", throttle_duration_sec=2.0)
+            self.get_logger().warn(f"TF fail: {e}", throttle_duration_sec=2.0)
 
-    # ── State machine tick ────────────────────────────────────────────────────
+    # ── State machine ──────────────────────────────────────────────────────────
 
     def _tick(self):
-        self._pub_status(self.state)
+        if self._busy:
+            return
+        self._pub_status(self._state)
 
-        if self.state == State.IDLE:
-            self.get_logger().info("Starting pick-and-place cycle…")
-            self.state = State.MOVE_HOME
+        if self._state == State.IDLE:
+            self._state = State.HOME
 
-        elif self.state == State.MOVE_HOME:
-            if self._move_named("home"):
-                self.state = State.OPEN_GRIPPER
+        elif self._state == State.HOME:
+            self._move_joints([0.0, 0.0, 0.0, 0.0, 0.0], duration=2.0)
+            self._state = State.OPEN_GRIPPER
 
-        elif self.state == State.OPEN_GRIPPER:
-            if self._move_gripper_named("open"):
-                self.state = State.DETECT_OBJECT
+        elif self._state == State.OPEN_GRIPPER:
+            self._move_gripper(0.0)
+            self._state = State.DETECT
 
-        elif self.state == State.DETECT_OBJECT:
-            if self.object_world is not None:
+        elif self._state == State.DETECT:
+            if self._object_world is not None:
                 self.get_logger().info(
-                    f"Object at world: "
-                    f"x={self.object_world.point.x:.3f} "
-                    f"y={self.object_world.point.y:.3f} "
-                    f"z={self.object_world.point.z:.3f}"
+                    f"Object: x={self._object_world.point.x:.3f} "
+                    f"y={self._object_world.point.y:.3f} "
+                    f"z={self._object_world.point.z:.3f}"
                 )
-                self.state = State.MOVE_PRE_GRASP
+                self._state = State.PRE_GRASP
             else:
-                self.get_logger().info("Waiting for object detection…",
-                                       throttle_duration_sec=2.0)
+                self.get_logger().info("Waiting for object…", throttle_duration_sec=2.0)
 
-        elif self.state == State.MOVE_PRE_GRASP:
-            p = self.object_world.point
-            pose = self._grasp_pose(p.x, p.y, p.z + self.PRE_GRASP_Z_OFFSET)
-            if self._move_to_pose(pose):
-                self.state = State.MOVE_GRASP
+        elif self._state == State.PRE_GRASP:
+            p = self._object_world.point
+            ok = self._move_cartesian(p.x, p.y, p.z + PRE_GRASP_Z, duration=2.5)
+            if ok:
+                self._state = State.GRASP
 
-        elif self.state == State.MOVE_GRASP:
-            p = self.object_world.point
-            pose = self._grasp_pose(p.x, p.y, p.z + self.GRASP_Z_OFFSET)
-            if self._move_to_pose(pose, velocity_scaling=0.2):
-                self.state = State.CLOSE_GRIPPER
+        elif self._state == State.GRASP:
+            p = self._object_world.point
+            ok = self._move_cartesian(p.x, p.y, p.z + GRASP_Z, duration=2.0)
+            if ok:
+                self._state = State.CLOSE_GRIP
 
-        elif self.state == State.CLOSE_GRIPPER:
-            if self._move_gripper_named("closed"):
-                time.sleep(0.5)
-                self.state = State.MOVE_POST_GRASP
+        elif self._state == State.CLOSE_GRIP:
+            self._move_gripper(0.8)
+            time.sleep(0.5)
+            self._state = State.POST_GRASP
 
-        elif self.state == State.MOVE_POST_GRASP:
-            p = self.object_world.point
-            pose = self._grasp_pose(p.x, p.y, p.z + self.PRE_GRASP_Z_OFFSET)
-            if self._move_to_pose(pose, velocity_scaling=0.3):
-                self.state = State.MOVE_PLACE
+        elif self._state == State.POST_GRASP:
+            p = self._object_world.point
+            ok = self._move_cartesian(p.x, p.y, p.z + PRE_GRASP_Z, duration=2.5)
+            if ok:
+                self._state = State.PLACE
 
-        elif self.state == State.MOVE_PLACE:
-            q = euler_to_quat(*self._PLACE_RPY)
-            pose = make_pose(*self._PLACE_XYZ, qx=q.x, qy=q.y, qz=q.z, qw=q.w)
-            if self._move_to_pose(pose):
-                self.state = State.OPEN_GRIPPER
-                # After placing, loop back to HOME for next cycle
-                self._scheduled_next = State.MOVE_HOME
+        elif self._state == State.PLACE:
+            x, y, z = PLACE_XYZ
+            ok = self._move_cartesian(x, y, z, duration=3.0)
+            if ok:
+                self._state = State.OPEN_GRIPPER
 
-        elif self.state == State.DONE:
+        elif self._state == State.DONE:
             self.get_logger().info("Cycle complete.", throttle_duration_sec=5.0)
 
-    # ── MoveIt2 helpers ───────────────────────────────────────────────────────
+    # ── Motion helpers ────────────────────────────────────────────────────────
 
-    def _move_named(self, name: str) -> bool:
-        self.arm.set_start_state_to_current_state()
-        self.arm.set_goal_state(configuration_name=name)
-        result = self.arm.plan()
-        if not result:
-            self.get_logger().error(f"Planning failed for named state '{name}'")
+    def _move_cartesian(self, x: float, y: float, z: float,
+                        duration: float = 2.0) -> bool:
+        q = _euler_to_quat(0.0, math.pi / 2, 0.0)
+        ps = PoseStamped()
+        ps.header.frame_id  = "world"
+        ps.header.stamp     = self.get_clock().now().to_msg()
+        ps.pose.position.x  = x
+        ps.pose.position.y  = y
+        ps.pose.position.z  = z
+        ps.pose.orientation = q
+
+        joints = self._compute_ik(ps)
+        if joints is None:
+            self.get_logger().error(f"IK failed for ({x:.3f},{y:.3f},{z:.3f})")
             return False
-        self.moveit.execute(result.trajectory, controllers=[])
+
+        self._move_joints(joints, duration=duration)
         return True
 
-    def _move_gripper_named(self, name: str) -> bool:
-        self.gripper.set_start_state_to_current_state()
-        self.gripper.set_goal_state(configuration_name=name)
-        result = self.gripper.plan()
-        if not result:
-            self.get_logger().error(f"Gripper planning failed for '{name}'")
-            return False
-        self.moveit.execute(result.trajectory, controllers=[])
-        return True
+    def _compute_ik(self, pose: PoseStamped) -> list | None:
+        if not self._ik_cli.wait_for_service(timeout_sec=1.0):
+            self.get_logger().error("/compute_ik not available")
+            return None
 
-    def _move_to_pose(self, pose: PoseStamped,
-                      velocity_scaling: float = 0.5) -> bool:
-        pose.header.stamp = self.get_clock().now().to_msg()
-        self.arm.set_start_state_to_current_state()
-        self.arm.set_goal_state(pose_stamped_msg=pose, pose_link="tcp")
+        req = GetPositionIK.Request()
+        req.ik_request = PositionIKRequest()
+        req.ik_request.group_name       = "arm"
+        req.ik_request.ik_link_name     = "tcp"
+        req.ik_request.pose_stamped     = pose
+        req.ik_request.avoid_collisions = True
+        req.ik_request.timeout.sec      = 0
+        req.ik_request.timeout.nanosec  = int(0.2 * 1e9)
 
-        plan_params = self.arm.get_planning_parameters()
-        plan_params.max_velocity_scaling_factor     = velocity_scaling
-        plan_params.max_acceleration_scaling_factor = velocity_scaling * 0.5
+        if self._js is not None:
+            req.ik_request.robot_state = RobotState()
+            req.ik_request.robot_state.joint_state = self._js
 
-        result = self.arm.plan(plan_params)
-        if not result:
-            self.get_logger().error("Cartesian planning failed")
-            return False
-        self.moveit.execute(result.trajectory, controllers=[])
-        return True
+        future = self._ik_cli.call_async(req)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=0.5)
 
-    def _grasp_pose(self, x: float, y: float, z: float) -> PoseStamped:
-        """TCP pointing down (gripper approaches from above)."""
-        q = euler_to_quat(0.0, math.pi / 2, 0.0)
-        return make_pose(x, y, z, qx=q.x, qy=q.y, qz=q.z, qw=q.w)
+        if not future.done() or future.result().error_code.val != 1:
+            return None
 
-    # ── util ──────────────────────────────────────────────────────────────────
+        js = future.result().solution.joint_state
+        name_pos = dict(zip(js.name, js.position))
+        try:
+            return [name_pos[j] for j in ARM_JOINTS]
+        except KeyError:
+            return None
+
+    def _move_joints(self, positions: list, duration: float = 2.0):
+        if not self._arm_client.wait_for_server(timeout_sec=2.0):
+            return
+        traj = _make_traj(ARM_JOINTS, positions, duration)
+        goal = FollowJointTrajectory.Goal()
+        goal.trajectory = traj
+        future = self._arm_client.send_goal_async(goal)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=duration + 1.0)
+
+    def _move_gripper(self, position: float, duration: float = 1.0):
+        if not self._grip_client.wait_for_server(timeout_sec=2.0):
+            return
+        traj = _make_traj(GRIPPER_JOINTS, [position], duration)
+        goal = FollowJointTrajectory.Goal()
+        goal.trajectory = traj
+        future = self._grip_client.send_goal_async(goal)
+        rclpy.spin_until_future_complete(self, future, timeout_sec=duration + 1.0)
 
     def _pub_status(self, text: str):
         msg = String()
         msg.data = text
-        self.status_pub.publish(msg)
+        self._status_pub.publish(msg)
 
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+
+def _make_traj(joint_names: list, positions: list, duration: float) -> JointTrajectory:
+    traj = JointTrajectory()
+    traj.joint_names = joint_names
+    pt = JointTrajectoryPoint()
+    pt.positions  = [float(p) for p in positions]
+    pt.velocities = [0.0] * len(positions)
+    sec  = int(duration)
+    nsec = int((duration - sec) * 1e9)
+    pt.time_from_start = RosDuration(sec=sec, nanosec=nsec)
+    traj.points = [pt]
+    return traj
+
+
+# ── Entry point ───────────────────────────────────────────────────────────────
 
 def main(args=None):
     rclpy.init(args=args)

@@ -27,7 +27,7 @@ NOTA: mock_components refleja los comandos de posición como joint_states.
 import os
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, TimerAction
-from launch.conditions import IfCondition
+from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -77,8 +77,10 @@ def generate_launch_description():
 
     return LaunchDescription([
         # ── Args ────────────────────────────────────────────────────────────
-        DeclareLaunchArgument("rviz",    default_value="true"),
-        DeclareLaunchArgument("log_csv", default_value="true"),
+        DeclareLaunchArgument("rviz",       default_value="true"),
+        DeclareLaunchArgument("log_csv",    default_value="true"),
+        DeclareLaunchArgument("realsense",  default_value="true",
+                              description="false = skip RealSense (sin cámara conectada)"),
 
         # ── 1. robot_state_publisher ─────────────────────────────────────────
         Node(
@@ -137,6 +139,7 @@ def generate_launch_description():
                     moveit_controllers,
                     {"use_sim_time": False},
                     {"publish_robot_description_semantic": True},
+                    {"planning_plugin": "ompl_interface/OMPLPlanner"},
                 ],
             ),
         ]),
@@ -148,6 +151,7 @@ def generate_launch_description():
             name="realsense_node",
             output="screen",
             parameters=[{"width": 640, "height": 480, "fps": 30}],
+            condition=IfCondition(LaunchConfiguration("realsense")),
         ),
 
         # ── 8. Vision detector (espera que la cámara arranque) ────────────────

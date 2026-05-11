@@ -67,7 +67,12 @@ class RealSenseNode(Node):
         cfg.enable_stream(rs.stream.color, self.W, self.H, rs.format.bgr8,   self.FPS)
         cfg.enable_stream(rs.stream.depth, self.W, self.H, rs.format.z16,    self.FPS)
 
-        profile = self.pipe.start(cfg)
+        try:
+            profile = self.pipe.start(cfg)
+        except RuntimeError as e:
+            self.get_logger().error(f"RealSense no conectada: {e}")
+            self.get_logger().error("Conecta la cámara y reinicia el nodo.")
+            raise
 
         # Align depth → color frame
         self.align = rs.align(rs.stream.color)
