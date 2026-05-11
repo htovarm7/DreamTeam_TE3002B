@@ -3,17 +3,16 @@
 
   <!-- Planning group: full arm (5 revolute joints) -->
   <group name="arm">
-    <joint name="joint1"/>
-    <joint name="joint2"/>
-    <joint name="joint3"/>
-    <joint name="joint4"/>
-    <joint name="joint5"/>
+    <joint name="shoulder_pan"/>
+    <joint name="shoulder_lift"/>
+    <joint name="elbow_flex"/>
+    <joint name="wrist_flex"/>
+    <joint name="wrist_roll"/>
   </group>
 
   <!-- Planning group: gripper -->
   <group name="gripper">
-    <joint name="gripper_left_joint"/>
-    <joint name="gripper_right_joint"/>
+    <joint name="gripper"/>
   </group>
 
   <!-- End-effector declaration -->
@@ -24,58 +23,52 @@
 
   <!-- Named poses for the arm -->
   <group_state name="home" group="arm">
-    <joint name="joint1" value="0"/>
-    <joint name="joint2" value="0"/>
-    <joint name="joint3" value="0"/>
-    <joint name="joint4" value="0"/>
-    <joint name="joint5" value="0"/>
+    <joint name="shoulder_pan"  value="0"/>
+    <joint name="shoulder_lift" value="0"/>
+    <joint name="elbow_flex"    value="0"/>
+    <joint name="wrist_flex"    value="0"/>
+    <joint name="wrist_roll"    value="0"/>
   </group_state>
 
   <group_state name="ready" group="arm">
-    <joint name="joint1" value="0"/>
-    <joint name="joint2" value="-0.5"/>
-    <joint name="joint3" value="0.8"/>
-    <joint name="joint4" value="-0.3"/>
-    <joint name="joint5" value="0"/>
+    <joint name="shoulder_pan"  value="0"/>
+    <joint name="shoulder_lift" value="-0.5"/>
+    <joint name="elbow_flex"    value="0.8"/>
+    <joint name="wrist_flex"    value="-0.3"/>
+    <joint name="wrist_roll"    value="0"/>
   </group_state>
 
   <group_state name="pre_grasp" group="arm">
-    <joint name="joint1" value="0"/>
-    <joint name="joint2" value="-0.8"/>
-    <joint name="joint3" value="1.2"/>
-    <joint name="joint4" value="-0.4"/>
-    <joint name="joint5" value="0"/>
+    <joint name="shoulder_pan"  value="0"/>
+    <joint name="shoulder_lift" value="-0.8"/>
+    <joint name="elbow_flex"    value="1.2"/>
+    <joint name="wrist_flex"    value="-0.4"/>
+    <joint name="wrist_roll"    value="0"/>
   </group_state>
 
   <!-- Named poses for gripper -->
   <group_state name="open" group="gripper">
-    <joint name="gripper_left_joint" value="-0.025"/>
-    <joint name="gripper_right_joint" value="-0.025"/>
+    <joint name="gripper" value="1.0"/>
   </group_state>
 
   <group_state name="closed" group="gripper">
-    <joint name="gripper_left_joint" value="0.0"/>
-    <joint name="gripper_right_joint" value="0.0"/>
+    <joint name="gripper" value="0.0"/>
   </group_state>
 
   <!-- Self-collision exclusions (adjacent links) -->
-  <disable_collisions link1="base_link" link2="link1" reason="Adjacent"/>
-  <disable_collisions link1="link1"     link2="link2" reason="Adjacent"/>
-  <disable_collisions link1="link2"     link2="link3" reason="Adjacent"/>
-  <disable_collisions link1="link3"     link2="link4" reason="Adjacent"/>
-  <disable_collisions link1="link4"     link2="link5" reason="Adjacent"/>
-  <disable_collisions link1="link5"     link2="gripper_base"  reason="Adjacent"/>
-  <disable_collisions link1="gripper_base" link2="gripper_left"  reason="Adjacent"/>
-  <disable_collisions link1="gripper_base" link2="gripper_right" reason="Adjacent"/>
-  <disable_collisions link1="gripper_left" link2="gripper_right" reason="Adjacent"/>
+  <disable_collisions link1="base_link"      link2="shoulder_link"   reason="Adjacent"/>
+  <disable_collisions link1="shoulder_link"  link2="upper_arm_link"  reason="Adjacent"/>
+  <disable_collisions link1="upper_arm_link" link2="lower_arm_link"  reason="Adjacent"/>
+  <disable_collisions link1="lower_arm_link" link2="wrist_link"      reason="Adjacent"/>
+  <disable_collisions link1="wrist_link"     link2="gripper_link"    reason="Adjacent"/>
+  <disable_collisions link1="gripper_link"   link2="moving_jaw_link" reason="Adjacent"/>
 
   <!-- Camera never collides with arm -->
-  <disable_collisions link1="zed2_base_link" link2="base_link"     reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="link1"         reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="link2"         reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="link3"         reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="link4"         reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="link5"         reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="gripper_base"  reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="base_link"      reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="shoulder_link"  reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="upper_arm_link" reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="lower_arm_link" reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="wrist_link"     reason="Never"/>
+  <disable_collisions link1="zed2_base_link" link2="gripper_link"   reason="Never"/>
 
 </robot>

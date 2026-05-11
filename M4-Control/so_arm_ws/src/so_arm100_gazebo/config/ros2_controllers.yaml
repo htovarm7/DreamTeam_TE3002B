@@ -14,11 +14,11 @@ controller_manager:
 arm_controller:
   ros__parameters:
     joints:
-      - joint1
-      - joint2
-      - joint3
-      - joint4
-      - joint5
+      - shoulder_pan
+      - shoulder_lift
+      - elbow_flex
+      - wrist_flex
+      - wrist_roll
     command_interfaces:
       - position
     state_interfaces:
@@ -33,8 +33,7 @@ arm_controller:
 gripper_controller:
   ros__parameters:
     joints:
-      - gripper_left_joint
-      - gripper_right_joint
+      - gripper
     command_interfaces:
       - position
     state_interfaces:

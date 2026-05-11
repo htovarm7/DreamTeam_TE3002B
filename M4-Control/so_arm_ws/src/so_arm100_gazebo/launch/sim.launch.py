@@ -21,6 +21,7 @@ from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 from ament_index_python.packages import get_package_share_directory
 
@@ -36,7 +37,7 @@ def generate_launch_description():
     world_file = os.path.join(gazebo_pkg, "worlds", "pick_place.world")
     ctrl_yaml  = os.path.join(gazebo_pkg, "config", "ros2_controllers.yaml")
 
-    robot_description_content = Command(["xacro ", urdf_file])
+    robot_description_content = ParameterValue(Command(["xacro ", urdf_file]), value_type=str)
     robot_description = {"robot_description": robot_description_content}
 
     # ── Gazebo ──────────────────────────────────────────────

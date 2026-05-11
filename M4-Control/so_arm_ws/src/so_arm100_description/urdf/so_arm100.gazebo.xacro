@@ -2,15 +2,13 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- Gazebo material overrides -->
-  <gazebo reference="base_link"><material>Gazebo/DarkGrey</material></gazebo>
-  <gazebo reference="link1"><material>Gazebo/Grey</material></gazebo>
-  <gazebo reference="link2"><material>Gazebo/White</material></gazebo>
-  <gazebo reference="link3"><material>Gazebo/Grey</material></gazebo>
-  <gazebo reference="link4"><material>Gazebo/White</material></gazebo>
-  <gazebo reference="link5"><material>Gazebo/DarkGrey</material></gazebo>
-  <gazebo reference="gripper_base"><material>Gazebo/DarkGrey</material></gazebo>
-  <gazebo reference="gripper_left"><material>Gazebo/Orange</material></gazebo>
-  <gazebo reference="gripper_right"><material>Gazebo/Orange</material></gazebo>
+  <gazebo reference="base_link">      <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="shoulder_link">  <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="upper_arm_link"> <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="lower_arm_link"> <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="wrist_link">     <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="gripper_link">   <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="moving_jaw_link"><material>Gazebo/Yellow</material></gazebo>
 
   <!-- ZED2 camera plugin (simulated stereo + depth) -->
   <gazebo reference="zed2_left_camera_frame">

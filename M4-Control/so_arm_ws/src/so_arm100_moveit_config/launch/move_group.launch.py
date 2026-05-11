@@ -2,6 +2,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 import os
 import yaml
@@ -21,9 +22,9 @@ def generate_launch_description():
     urdf_file = PathJoinSubstitution([desc_pkg, "urdf", "so_arm100.urdf.xacro"])
     srdf_file = PathJoinSubstitution([moveit_pkg, "config", "so_arm100.srdf"])
 
-    robot_description = {"robot_description": Command(["xacro ", urdf_file])}
+    robot_description = {"robot_description": ParameterValue(Command(["xacro ", urdf_file]), value_type=str)}
     robot_description_semantic = {
-        "robot_description_semantic": Command(["cat ", srdf_file])
+        "robot_description_semantic": ParameterValue(Command(["cat ", srdf_file]), value_type=str)
     }
 
     kinematics_yaml      = load_yaml("so_arm100_moveit_config", "config/kinematics.yaml")
