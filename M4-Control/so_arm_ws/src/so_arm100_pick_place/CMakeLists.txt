@@ -14,11 +14,18 @@ install(PROGRAMS
   so_arm100_pick_place/move_physical.py
   so_arm100_pick_place/teach_poses.py
   so_arm100_pick_place/lqr_visual_servoing.py
+  so_arm100_pick_place/feetech_bridge.py
+  so_arm100_pick_place/pick_demo.py
   so_arm100_pick_place/plot_vs_results.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(DIRECTORY launch config rviz
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(FILES
+  so_arm100_pick_place/poses.json
   DESTINATION share/${PROJECT_NAME}
 )
 

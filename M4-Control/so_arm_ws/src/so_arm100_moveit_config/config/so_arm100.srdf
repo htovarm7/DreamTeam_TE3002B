@@ -1,13 +1,10 @@
 <?xml version="1.0"?>
 <robot name="so_arm100">
 
-  <!-- Planning group: full arm (5 revolute joints) -->
+  <!-- Planning group: arm defined as kinematic chain base→tcp -->
+  <!-- Using chain instead of joints so KDL extends through fixed joints to tcp -->
   <group name="arm">
-    <joint name="shoulder_pan"/>
-    <joint name="shoulder_lift"/>
-    <joint name="elbow_flex"/>
-    <joint name="wrist_flex"/>
-    <joint name="wrist_roll"/>
+    <chain base_link="base_link" tip_link="tcp"/>
   </group>
 
   <!-- Planning group: gripper -->
@@ -64,11 +61,5 @@
   <disable_collisions link1="gripper_link"   link2="moving_jaw_link" reason="Adjacent"/>
 
   <!-- Camera never collides with arm -->
-  <disable_collisions link1="zed2_base_link" link2="base_link"      reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="shoulder_link"  reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="upper_arm_link" reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="lower_arm_link" reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="wrist_link"     reason="Never"/>
-  <disable_collisions link1="zed2_base_link" link2="gripper_link"   reason="Never"/>
 
 </robot>

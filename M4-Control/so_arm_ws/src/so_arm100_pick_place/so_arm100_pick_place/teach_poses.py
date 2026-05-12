@@ -40,9 +40,11 @@ CALIBRATION = {
                                       range_min=2032, range_max=3555),
 }
 
-SCRIPT_DIR   = Path(__file__).parent
-POSES_FILE   = SCRIPT_DIR / "poses.json"
-MOVE_SCRIPT  = SCRIPT_DIR / "move_physical.py"
+SCRIPT_DIR  = Path(__file__).parent
+MOVE_SCRIPT = SCRIPT_DIR / "move_physical.py"
+
+# poses.json se guarda en el source (teach_poses corre directo, no como nodo ROS2)
+POSES_FILE  = SCRIPT_DIR / "poses.json"
 
 
 # ── Bus factory ───────────────────────────────────────────────────────────────

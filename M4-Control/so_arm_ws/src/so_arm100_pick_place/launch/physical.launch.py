@@ -99,12 +99,15 @@ def generate_launch_description():
         ),
 
         # ── 3-5. Spawner de controllers (con delay para que CM arranque) ─────
+        # joint_state_broadcaster se redirige a /joint_states_mock
+        # para que el feetech_bridge publique las posiciones REALES en /joint_states
         TimerAction(period=2.0, actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
                 arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
                 output="screen",
+                remappings=[("/joint_states", "/joint_states_mock")],
             ),
         ]),
         TimerAction(period=3.0, actions=[
@@ -144,7 +147,20 @@ def generate_launch_description():
             ),
         ]),
 
-        # ── 7. RealSense D435 ─────────────────────────────────────────────────
+        # ── 7. Feetech bridge — conecta ros2_control ↔ motores físicos ──────────
+        Node(
+            package="so_arm100_pick_place",
+            executable="feetech_bridge.py",
+            name="feetech_bridge",
+            output="screen",
+            parameters=[{
+                "port":       "/dev/ttyACM0",
+                "move_time":  0.15,
+                "deadband_deg": 0.5,
+            }],
+        ),
+
+        # ── 8. RealSense D435 ─────────────────────────────────────────────────
         Node(
             package="so_arm100_pick_place",
             executable="realsense_node.py",
@@ -162,7 +178,7 @@ def generate_launch_description():
                 name="vision_detector",
                 output="screen",
                 parameters=[{
-                    "min_depth_m":  0.10,
+                    "min_depth_m":  0.05,
                     "max_depth_m":  1.20,
                     "camera_frame": "camera_color_optical_frame",
                     "world_frame":  "world",

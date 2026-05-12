@@ -178,10 +178,12 @@ class LQRVisualServoingNode(Node):
     def _vision_cb(self, msg: PoseStamped):
         try:
             pt = PointStamped()
-            pt.header = msg.header
-            pt.point  = msg.pose.position
-            pt_world  = self._tf_buf.transform(
-                pt, self._world_frame, timeout=Duration(seconds=0.05)
+            # Usar Time() = transform más reciente disponible (evita extrapolation error)
+            pt.header.frame_id = msg.header.frame_id
+            pt.header.stamp    = rclpy.time.Time().to_msg()
+            pt.point           = msg.pose.position
+            pt_world = self._tf_buf.transform(
+                pt, self._world_frame, timeout=Duration(seconds=0.1)
             )
             p = np.array([pt_world.point.x, pt_world.point.y, pt_world.point.z])
             with self._lock:
@@ -323,8 +325,8 @@ class LQRVisualServoingNode(Node):
         req.ik_request.group_name = "arm"
         req.ik_request.ik_link_name = self._ee_link
         req.ik_request.timeout.sec  = 0
-        req.ik_request.timeout.nanosec = int(0.1 * 1e9)
-        req.ik_request.avoid_collisions = True
+        req.ik_request.timeout.nanosec = int(0.2 * 1e9)
+        req.ik_request.avoid_collisions = False  # deshabilitar para diagnostico
 
         # Target pose (gripper pointing down)
         ps = PoseStamped()
@@ -342,12 +344,19 @@ class LQRVisualServoingNode(Node):
             req.ik_request.robot_state.joint_state = seed_js
 
         future = self._ik_cli.call_async(req)
-        rclpy.spin_until_future_complete(self, future, timeout_sec=0.15)
+        # Esperar desde thread sin llamar spin (ya corre en main thread)
+        deadline = time.monotonic() + 0.35
+        while not future.done() and time.monotonic() < deadline:
+            time.sleep(0.005)
 
         if not future.done():
+            self.get_logger().warn("[LQR] IK timeout", throttle_duration_sec=3.0)
             return None
         resp = future.result()
-        if resp.error_code.val != 1:   # 1 = SUCCESS
+        if resp.error_code.val != 1:
+            # -31=NO_IK_SOLUTION  -12=GOAL_IN_COLLISION  -10=INVALID_LINK_NAME
+            self.get_logger().warn(f"[LQR] IK error_code={resp.error_code.val}",
+                                   throttle_duration_sec=1.0)
             return None
 
         # Extract arm joint positions in order

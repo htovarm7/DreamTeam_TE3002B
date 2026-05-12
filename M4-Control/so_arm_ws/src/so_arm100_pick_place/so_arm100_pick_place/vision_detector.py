@@ -81,14 +81,15 @@ OBJECTS = {
         "circularity": (0.55, 1.0),
     },
     "cereal_box": {
-        "color": (0.6, 0.3, 0.0, 1.0),
+        "color": (0.1, 0.3, 0.9, 1.0),   # azul para RViz
         "masks": [
-            (np.array([0,   0,  180]), np.array([180, 50, 255])),  # near-white/grey
-            (np.array([10,  80, 100]), np.array([40, 255, 220])),  # warm tones
+            (np.array([90,  60,  60]), np.array([130, 255, 255])),  # azul (Kellogg's)
+            (np.array([10,  80, 100]), np.array([35,  255, 220])),  # naranja/amarillo label
+            (np.array([0,   0,  180]), np.array([180,  40, 255])),  # blanco/gris
         ],
-        "min_area": 5000,
-        "aspect_ratio": (0.4, 3.0),
-        "circularity": (0.0, 0.6),
+        "min_area": 4000,
+        "aspect_ratio": (0.3, 3.5),
+        "circularity": (0.0, 0.75),
     },
 }
 

@@ -92,17 +92,21 @@ class RealSenseNode(Node):
         ci.height = intr.height
         ci.distortion_model = "plumb_bob"
         ci.d  = list(intr.coeffs)
-        ci.k  = [intr.fx, 0, intr.ppx,
-                 0, intr.fy, intr.ppy,
-                 0, 0, 1]
-        ci.r  = [1, 0, 0,  0, 1, 0,  0, 0, 1]
-        ci.p  = [intr.fx, 0, intr.ppx, 0,
-                 0, intr.fy, intr.ppy, 0,
-                 0, 0, 1, 0]
+        ci.k  = [intr.fx, 0.0, intr.ppx,
+                 0.0, intr.fy, intr.ppy,
+                 0.0, 0.0, 1.0]
+        ci.r  = [1.0, 0.0, 0.0,  0.0, 1.0, 0.0,  0.0, 0.0, 1.0]
+        ci.p  = [intr.fx, 0.0, intr.ppx, 0.0,
+                 0.0, intr.fy, intr.ppy, 0.0,
+                 0.0, 0.0, 1.0, 0.0]
         return ci
 
     def _grab(self):
-        frames = self.pipe.wait_for_frames(timeout_ms=100)
+        try:
+            frames = self.pipe.wait_for_frames(timeout_ms=5000)
+        except RuntimeError:
+            self.get_logger().warn("Frame timeout, reintentando...", throttle_duration_sec=2.0)
+            return
         aligned = self.align.process(frames)
 
         color_frame = aligned.get_color_frame()

@@ -40,25 +40,24 @@ MOVE_TIME = 2.0   # segundos que tarda en llegar a la posición
 
 # Valores en grados (motor body joints) y 0-100 (gripper)
 NAMED_POSES = {
-    "home":      {"shoulder_pan":  0, "shoulder_lift":  0,
-                  "elbow_flex":    0, "wrist_flex":      0,
-                  "wrist_roll":    0, "gripper":        50},
+    "detections": {
+                  "shoulder_pan": -1.71,
+                  "shoulder_lift": -47.6,
+                  "elbow_flex": 47.56,
+                  "wrist_flex": 24.62,
+                  "wrist_roll": 175.25,
+                  "gripper": 1.44
+               },
 
-    "ready":     {"shoulder_pan":  0, "shoulder_lift": -30,
-                  "elbow_flex":   50, "wrist_flex":    -20,
-                  "wrist_roll":    0, "gripper":        50},
+    "home": {
+                  "shoulder_pan": 1.27,
+                  "shoulder_lift": -54.29,
+                  "elbow_flex": 45.8,
+                  "wrist_flex": 85.01,
+                  "wrist_roll": -178.42,
+                  "gripper": 0.79
+               },
 
-    "pre_grasp": {"shoulder_pan":  0, "shoulder_lift": -45,
-                  "elbow_flex":   70, "wrist_flex":    -25,
-                  "wrist_roll":    0, "gripper":        10},
-
-    "open":      {"shoulder_pan":  0, "shoulder_lift":  0,
-                  "elbow_flex":    0, "wrist_flex":      0,
-                  "wrist_roll":    0, "gripper":         0},
-
-    "closed":    {"shoulder_pan":  0, "shoulder_lift":  0,
-                  "elbow_flex":    0, "wrist_flex":      0,
-                  "wrist_roll":    0, "gripper":       100},
 }
 
 

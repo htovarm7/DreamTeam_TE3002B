@@ -323,41 +323,43 @@
   </joint>
   <link name="tcp"/>
 
-  <!-- ── ZED2 camera (fixed to world) ──────────────────────── -->
-  <joint name="camera_mount_joint" type="fixed">
-    <parent link="world"/>
-    <child  link="zed2_base_link"/>
-    <origin xyz="-0.35 0 0.30" rpy="0 0.4 0"/>
-  </joint>
+  <!-- ── RealSense D435 montada en gripper_link ─────────────── -->
+  <!--
+    CALIBRACIÓN REQUERIDA:
+    Mide la posición de la cámara relativa al gripper_link:
+      xyz: desplazamiento en metros (X=frente, Y=izquierda, Z=arriba del gripper)
+      rpy: orientación en radianes
 
-  <link name="zed2_base_link">
+    Para calibrar, mueve el brazo a una posición conocida, mide con regla
+    la posición física de la cámara respecto al gripper y actualiza los valores.
+  -->
+  <joint name="camera_joint" type="fixed">
+    <parent link="gripper_link"/>
+    <child  link="camera_link"/>
+    <origin xyz="0.02 0.0 0.04" rpy="0 ${pi/2} 0"/>
+  </joint>
+  <link name="camera_link">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.175 0.030 0.033"/></geometry>
+      <geometry><box size="0.090 0.025 0.025"/></geometry>
       <material name="black"/>
     </visual>
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry><box size="0.175 0.030 0.033"/></geometry>
-    </collision>
-    <inertial>
-      <mass value="0.16"/>
-      <inertia ixx="1.5e-5" ixy="0" ixz="0" iyy="4.1e-4" iyz="0" izz="4.1e-4"/>
-    </inertial>
   </link>
 
-  <joint name="zed2_left_camera_joint" type="fixed">
-    <parent link="zed2_base_link"/>
-    <child  link="zed2_left_camera_frame"/>
-    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
-  </joint>
-  <link name="zed2_left_camera_frame"/>
-
-  <joint name="zed2_left_camera_optical_joint" type="fixed">
-    <parent link="zed2_left_camera_frame"/>
-    <child  link="zed2_left_camera_optical_frame"/>
+  <!-- color sensor frame (mismo que camera_link con offset mínimo) -->
+  <joint name="camera_color_joint" type="fixed">
+    <parent link="camera_link"/>
+    <child  link="camera_color_frame"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
   </joint>
-  <link name="zed2_left_camera_optical_frame"/>
+  <link name="camera_color_frame"/>
+
+  <!-- optical frame: Z=frente, X=derecha, Y=abajo  (convención RealSense) -->
+  <joint name="camera_color_optical_joint" type="fixed">
+    <parent link="camera_color_frame"/>
+    <child  link="camera_color_optical_frame"/>
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
+  </joint>
+  <link name="camera_color_optical_frame"/>
 
 </robot>
