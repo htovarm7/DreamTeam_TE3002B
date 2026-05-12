@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Gazebo material overrides -->
+  <gazebo reference="base_link">      <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="shoulder_link">  <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="upper_arm_link"> <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="lower_arm_link"> <material>Gazebo/Yellow</material></gazebo>
+  <gazebo reference="wrist_link">     <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="gripper_link">   <material>Gazebo/DarkGrey</material></gazebo>
+  <gazebo reference="moving_jaw_link"><material>Gazebo/Yellow</material></gazebo>
+
+  <!-- gazebo_ros2_control plugin — loads controllers from yaml at startup -->
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>$(find so101_description)/config/ros2_controllers.yaml</parameters>
+      <robot_param>robot_description</robot_param>
+      <robot_param_node>robot_state_publisher</robot_param_node>
+    </plugin>
+  </gazebo>
+
+</robot>

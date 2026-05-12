@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
-# Build the SO-ARM100 workspace
+# build.sh — Compilar el workspace SO-ARM101
+# Uso: ./build.sh
 set -e
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+WS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "=== Sourcing ROS2 Humble ==="
 source /opt/ros/humble/setup.bash
 
-echo "=== Installing Python deps ==="
-pip3 install -q opencv-python numpy
-
-echo "=== Building workspace ==="
+cd "$WS_DIR"
 colcon build --symlink-install \
+             --packages-select so101_description so101_bringup \
              --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 echo ""
-echo "=== Build complete! ==="
-echo "Run:  source install/setup.bash"
-echo "Then: ros2 launch so_arm100_gazebo sim.launch.py"
-echo "Then (new terminal): ros2 launch so_arm100_pick_place pick_place.launch.py"
+echo "✓ Build completado. Ejecuta:"
+echo "  source $WS_DIR/install/setup.bash"
+echo ""
+echo "Launches disponibles:"
+echo "  ros2 launch so101_bringup gazebo.launch.py          # Simulación Gazebo"
+echo "  ros2 launch so101_bringup physical.launch.py        # Robot físico"
+echo "  ros2 launch so101_bringup sync.launch.py            # Gazebo + físico en sync"
+echo "  ros2 launch so101_description display.launch.py     # Solo URDF en RViz2"
