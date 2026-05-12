@@ -29,6 +29,7 @@ from pathlib import Path
 import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
+from ament_index_python.packages import get_package_share_directory
 
 from std_msgs.msg import String
 
@@ -38,8 +39,15 @@ from lerobot.motors.feetech import FeetechMotorsBus, OperatingMode
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-PORT       = "/dev/ttyACM0"
-POSES_FILE = Path(__file__).parent / "poses.json"
+PORT = "/dev/ttyACM0"
+
+def _poses_file() -> Path:
+    try:
+        return Path(get_package_share_directory("so_arm100_pick_place")) / "poses.json"
+    except Exception:
+        return Path(__file__).parent / "poses.json"
+
+POSES_FILE = _poses_file()
 MOVE_TIME  = 2.0   # segundos entre poses
 GRIP_TIME  = 0.8   # tiempo para cerrar/abrir gripper
 
@@ -178,12 +186,12 @@ class PickDemo(Node):
         # 4. Grasp
         self._step("GRASP", "grasp", move_time=1.5)
 
-        # 5. Cerrar gripper
+        # 5. Cerrar gripper  (lerobot: 0=cerrado, 100=abierto)
         self._pub("CLOSE_GRIPPER")
         self.get_logger().info("→ Cerrando gripper...")
         if self._manual:
             input("  [ENTER para cerrar gripper]")
-        self._gripper(90)   # 90% = casi cerrado
+        self._gripper(5)    # 5% = casi cerrado
         time.sleep(GRIP_TIME)
 
         # 6. Levantar (volver a pre_grasp)
@@ -192,12 +200,12 @@ class PickDemo(Node):
         # 7. Place
         self._step("PLACE", "place")
 
-        # 8. Abrir gripper
+        # 8. Abrir gripper  (lerobot: 0=cerrado, 100=abierto)
         self._pub("OPEN_GRIPPER")
         self.get_logger().info("→ Abriendo gripper...")
         if self._manual:
             input("  [ENTER para abrir gripper]")
-        self._gripper(5)    # 5% = casi abierto
+        self._gripper(90)   # 90% = casi abierto
         time.sleep(GRIP_TIME)
 
         # 9. Volver a detections para siguiente ciclo

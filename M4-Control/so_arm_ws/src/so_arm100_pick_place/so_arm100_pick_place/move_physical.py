@@ -36,7 +36,7 @@ from lerobot.motors.feetech import FeetechMotorsBus, OperatingMode
 # ── Configuración ─────────────────────────────────────────────────────────────
 
 PORT      = "/dev/ttyACM0"
-MOVE_TIME = 2.0   # segundos que tarda en llegar a la posición
+MOVE_TIME = 5.0   # segundos que tarda en llegar a la posición
 
 # Valores en grados (motor body joints) y 0-100 (gripper)
 NAMED_POSES = {
@@ -54,8 +54,35 @@ NAMED_POSES = {
                   "shoulder_lift": -54.29,
                   "elbow_flex": 45.8,
                   "wrist_flex": 85.01,
-                  "wrist_roll": -178.42,
+                  "wrist_roll": 178.42,
                   "gripper": 0.79
+               },
+
+    "pre_grasp": {
+                  "shoulder_pan": 1.89,
+                  "shoulder_lift": 55.6,
+                  "elbow_flex": -79.74,
+                  "wrist_flex": 110.77,
+                  "wrist_roll": 178.07,
+                  "gripper": 1.18
+               },
+
+    "grasp": {
+                  "shoulder_pan": 14.55,
+                  "shoulder_lift": 87.25,
+                  "elbow_flex": -73.23,
+                  "wrist_flex": 101.71,
+                  "wrist_roll": 125.14,
+                  "gripper": 32.5
+               },
+
+    "place": {
+                  "shoulder_pan": 75.12,
+                  "shoulder_lift": 85.67,
+                  "elbow_flex": -73.14,
+                  "wrist_flex": 102.15,
+                  "wrist_roll": 141.67,
+                  "gripper": 29.94
                },
 
 }

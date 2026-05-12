@@ -288,19 +288,25 @@ class LQRVisualServoingNode(Node):
         self._log(e, u, e_norm, phase)
         return e_norm < threshold
 
-    # ── EE position via TF ────────────────────────────────────────────────────
+    # ── EE position and orientation via TF ───────────────────────────────────
 
-    def _get_ee_pos(self):
+    def _get_ee_tf(self):
+        """Returns (position, quaternion) of TCP in world frame, or (None, None)."""
         try:
             tf = self._tf_buf.lookup_transform(
                 self._world_frame, self._ee_link,
                 rclpy.time.Time(), timeout=Duration(seconds=0.05),
             )
             t = tf.transform.translation
-            return np.array([t.x, t.y, t.z])
+            r = tf.transform.rotation
+            return np.array([t.x, t.y, t.z]), r
         except Exception as e:
             self.get_logger().warn(f"[LQR] EE TF fail: {e}", throttle_duration_sec=2.0)
-            return None
+            return None, None
+
+    def _get_ee_pos(self):
+        pos, _ = self._get_ee_tf()
+        return pos
 
     # ── Cartesian command via IK + trajectory ─────────────────────────────────
 
@@ -308,64 +314,80 @@ class LQRVisualServoingNode(Node):
         with self._lock:
             js = self._joint_state
 
-        joints = self._compute_ik(pos, js)
+        # Usar la orientación actual del TCP — 5-DOF no soporta orientación arbitraria
+        _, current_rot = self._get_ee_tf()
+        if current_rot is None:
+            return
+
+        joints = self._compute_ik(pos, js, current_rot)
         if joints is None:
             self.get_logger().warn("[LQR] IK failed, skipping step.", throttle_duration_sec=1.0)
             return
 
         self._send_arm_trajectory(joints, duration_sec=DT * 1.2)
 
-    def _compute_ik(self, pos: np.ndarray, seed_js: JointState):
+    def _compute_ik(self, pos: np.ndarray, seed_js: JointState, orientation=None):
         if not self._ik_cli.wait_for_service(timeout_sec=0.5):
             self.get_logger().warn("[LQR] /compute_ik not available.", throttle_duration_sec=5.0)
             return None
 
-        req = GetPositionIK.Request()
-        req.ik_request = PositionIKRequest()
-        req.ik_request.group_name = "arm"
-        req.ik_request.ik_link_name = self._ee_link
-        req.ik_request.timeout.sec  = 0
-        req.ik_request.timeout.nanosec = int(0.2 * 1e9)
-        req.ik_request.avoid_collisions = False  # deshabilitar para diagnostico
+        # Orientación natural del robot al-zeros (0, 0.707, 0, 0.707)
+        target_orientation = orientation if orientation is not None \
+            else _euler_to_quat(0.0, math.pi / 2, 0.0)
 
-        # Target pose (gripper pointing down)
-        ps = PoseStamped()
-        ps.header.frame_id    = self._world_frame
-        ps.header.stamp       = self.get_clock().now().to_msg()
-        ps.pose.position.x    = float(pos[0])
-        ps.pose.position.y    = float(pos[1])
-        ps.pose.position.z    = float(pos[2])
-        ps.pose.orientation   = _euler_to_quat(0.0, math.pi / 2, 0.0)
-        req.ik_request.pose_stamped = ps
-
-        # Seed state
+        # Probar con seed actual Y con seed en zeros — LMA necesita buen punto inicial
+        seeds_to_try = []
         if seed_js is not None:
+            seeds_to_try.append(seed_js)
+        # Seed en zeros (posición natural del modelo URDF)
+        zero_seed = JointState()
+        zero_seed.name     = list(ARM_JOINTS)
+        zero_seed.position = [0.0] * len(ARM_JOINTS)
+        seeds_to_try.append(zero_seed)
+
+        for seed in seeds_to_try:
+            req = GetPositionIK.Request()
+            req.ik_request = PositionIKRequest()
+            req.ik_request.group_name      = "arm"
+            req.ik_request.ik_link_name    = self._ee_link
+            req.ik_request.timeout.sec     = 0
+            req.ik_request.timeout.nanosec = int(0.5 * 1e9)
+            req.ik_request.avoid_collisions = False
+
+            ps = PoseStamped()
+            ps.header.frame_id = self._world_frame
+            ps.header.stamp    = self.get_clock().now().to_msg()
+            ps.pose.position.x = float(pos[0])
+            ps.pose.position.y = float(pos[1])
+            ps.pose.position.z = float(pos[2])
+            ps.pose.orientation = target_orientation
+            req.ik_request.pose_stamped = ps
+
             req.ik_request.robot_state = RobotState()
-            req.ik_request.robot_state.joint_state = seed_js
+            req.ik_request.robot_state.joint_state = seed
 
-        future = self._ik_cli.call_async(req)
-        # Esperar desde thread sin llamar spin (ya corre en main thread)
-        deadline = time.monotonic() + 0.35
-        while not future.done() and time.monotonic() < deadline:
-            time.sleep(0.005)
+            future = self._ik_cli.call_async(req)
+            deadline = time.monotonic() + 1.2
+            while not future.done() and time.monotonic() < deadline:
+                time.sleep(0.005)
 
-        if not future.done():
-            self.get_logger().warn("[LQR] IK timeout", throttle_duration_sec=3.0)
-            return None
-        resp = future.result()
-        if resp.error_code.val != 1:
-            # -31=NO_IK_SOLUTION  -12=GOAL_IN_COLLISION  -10=INVALID_LINK_NAME
-            self.get_logger().warn(f"[LQR] IK error_code={resp.error_code.val}",
-                                   throttle_duration_sec=1.0)
-            return None
+            if not future.done():
+                continue  # intenta con otro seed
 
-        # Extract arm joint positions in order
-        js = resp.solution.joint_state
-        name_to_pos = dict(zip(js.name, js.position))
-        try:
-            return [name_to_pos[j] for j in ARM_JOINTS]
-        except KeyError:
-            return None
+            resp = future.result()
+            if resp.error_code.val == 1:
+                js = resp.solution.joint_state
+                name_to_pos = dict(zip(js.name, js.position))
+                try:
+                    result = [name_to_pos[j] for j in ARM_JOINTS]
+                    return result
+                except KeyError:
+                    continue
+
+            self.get_logger().warn(f"[LQR] IK error_code={resp.error_code.val} (seed retry)",
+                                   throttle_duration_sec=2.0)
+
+        return None
 
     def _send_arm_trajectory(self, positions: list, duration_sec: float):
         if not self._arm_client.wait_for_server(timeout_sec=1.0):

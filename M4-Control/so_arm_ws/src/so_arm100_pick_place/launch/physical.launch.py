@@ -91,23 +91,23 @@ def generate_launch_description():
         ),
 
         # ── 2. controller_manager (mock hardware) ────────────────────────────
+        # Remapeamos joint_states→joint_states_mock a NIVEL DEL NODO
+        # para que feetech_bridge sea el único publicador de /joint_states reales
         Node(
             package="controller_manager",
             executable="ros2_control_node",
             output="screen",
             parameters=[robot_description, ctrl_yaml, {"use_sim_time": False}],
+            remappings=[("joint_states", "joint_states_mock")],
         ),
 
-        # ── 3-5. Spawner de controllers (con delay para que CM arranque) ─────
-        # joint_state_broadcaster se redirige a /joint_states_mock
-        # para que el feetech_bridge publique las posiciones REALES en /joint_states
+        # ── 3-5. Spawner de controllers ──────────────────────────────────────
         TimerAction(period=2.0, actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
                 arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
                 output="screen",
-                remappings=[("/joint_states", "/joint_states_mock")],
             ),
         ]),
         TimerAction(period=3.0, actions=[
