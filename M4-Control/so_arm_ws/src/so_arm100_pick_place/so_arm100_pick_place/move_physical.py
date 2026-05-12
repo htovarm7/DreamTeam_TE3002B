@@ -58,31 +58,67 @@ NAMED_POSES = {
                   "gripper": 0.79
                },
 
-    "pre_grasp": {
-                  "shoulder_pan": 1.89,
-                  "shoulder_lift": 55.6,
-                  "elbow_flex": -79.74,
-                  "wrist_flex": 110.77,
-                  "wrist_roll": 178.07,
-                  "gripper": 1.18
+    "HOME": {
+                  "shoulder_pan": 17.63,
+                  "shoulder_lift": -30.55,
+                  "elbow_flex": -40.0,
+                  "wrist_flex": 95.56,
+                  "wrist_roll": 172.0,
+                  "gripper": 6.37
                },
 
-    "grasp": {
-                  "shoulder_pan": 14.55,
-                  "shoulder_lift": 87.25,
-                  "elbow_flex": -73.23,
-                  "wrist_flex": 101.71,
-                  "wrist_roll": 125.14,
-                  "gripper": 32.5
+    "PRE_GRASP": {
+                  "shoulder_pan": 19.21,
+                  "shoulder_lift": 46.2,
+                  "elbow_flex": -42.99,
+                  "wrist_flex": 104.7,
+                  "wrist_roll": 172.09,
+                  "gripper": 72.42
                },
 
-    "place": {
-                  "shoulder_pan": 75.12,
-                  "shoulder_lift": 85.67,
-                  "elbow_flex": -73.14,
-                  "wrist_flex": 102.15,
-                  "wrist_roll": 141.67,
-                  "gripper": 29.94
+    "GRASP": {
+                  "shoulder_pan": 18.68,
+                  "shoulder_lift": 66.51,
+                  "elbow_flex": -42.9,
+                  "wrist_flex": 89.49,
+                  "wrist_roll": 172.0,
+                  "gripper": 18.32
+               },
+
+    "LIFT": {
+                  "shoulder_pan": 12.53,
+                  "shoulder_lift": 40.13,
+                  "elbow_flex": -100.22,
+                  "wrist_flex": 90.02,
+                  "wrist_roll": 171.91,
+                  "gripper": 18.32
+               },
+
+    "PLACE": {
+                  "shoulder_pan": 100.0,
+                  "shoulder_lift": 77.67,
+                  "elbow_flex": -71.47,
+                  "wrist_flex": 99.16,
+                  "wrist_roll": 172.35,
+                  "gripper": 18.32
+               },
+
+    "OPEN_GRIPPER": {
+                  "shoulder_pan": 100.09,
+                  "shoulder_lift": 78.99,
+                  "elbow_flex": -71.56,
+                  "wrist_flex": 99.52,
+                  "wrist_roll": -176.4,
+                  "gripper": 93.24
+               },
+
+    "PRE_HOME": {
+                  "shoulder_pan": 99.47,
+                  "shoulder_lift": 8.75,
+                  "elbow_flex": -71.47,
+                  "wrist_flex": 99.69,
+                  "wrist_roll": -176.48,
+                  "gripper": 93.24
                },
 
 }

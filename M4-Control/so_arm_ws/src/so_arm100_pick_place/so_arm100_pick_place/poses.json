@@ -1,18 +1,50 @@
 {
-    "detections": {
-        "shoulder_pan": -1.71,
-        "shoulder_lift": -47.6,
-        "elbow_flex": 47.56,
-        "wrist_flex": 24.62,
-        "wrist_roll": 175.25,
-        "gripper": 1.44
+    "HOME": {
+        "shoulder_pan": 17.63,
+        "shoulder_lift": -30.55,
+        "elbow_flex": -40.0,
+        "wrist_flex": 95.56,
+        "wrist_roll": 172.0,
+        "gripper": 6.37
     },
-    "home": {
-        "shoulder_pan": 1.27,
-        "shoulder_lift": -54.29,
-        "elbow_flex": 45.8,
-        "wrist_flex": 85.01,
-        "wrist_roll": 178.42,
-        "gripper": 0.79
+    "PRE_GRASP": {
+        "shoulder_pan": 70.21,
+        "shoulder_lift": 60.2,
+        "elbow_flex": -42.99,
+        "wrist_flex": 104.7,
+        "wrist_roll": 172.09,
+        "gripper": 72.42
+    },
+    "GRASP": {
+        "shoulder_pan": 18.68,
+        "shoulder_lift": 70.51,
+        "elbow_flex": -42.9,
+        "wrist_flex": 89.49,
+        "wrist_roll": 172.0,
+        "gripper": 10.32
+    },
+    "LIFT": {
+        "shoulder_pan": 12.53,
+        "shoulder_lift": 7.13,
+        "elbow_flex": -80.22,
+        "wrist_flex": 90.02,
+        "wrist_roll": 171.91,
+        "gripper": 18.32
+    },
+    "PLACE": {
+        "shoulder_pan": -40.0,
+        "shoulder_lift": 77.67,
+        "elbow_flex": -71.47,
+        "wrist_flex": 99.16,
+        "wrist_roll": 172.35,
+        "gripper": 18.32
+    },
+    "OPEN_GRIPPER": {
+        "shoulder_pan": 100.09,
+        "shoulder_lift": 78.99,
+        "elbow_flex": -71.56,
+        "wrist_flex": 99.52,
+        "wrist_roll": 176.4,
+        "gripper": 93.24
     }
 }

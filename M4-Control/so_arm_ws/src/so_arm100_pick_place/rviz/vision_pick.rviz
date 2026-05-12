@@ -5,26 +5,25 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /RobotModel1
-        - /MarkerArray1
-        - /Image1
-        - /Image2
       Splitter Ratio: 0.5
-    Tree Height: 557
+    Tree Height: 317
   - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
     Name: Views
-
+    Splitter Ratio: 0.5
 Visualization Manager:
   Class: ""
   Displays:
-    # ── Grid ──────────────────────────────────────────────────────────────────
-    - Class: rviz_default_plugins/Grid
-      Name: Grid
-      Enabled: true
-      Cell Size: 0.1
+    - Alpha: 0.5
+      Cell Size: 0.10000000149011612
+      Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
+      Enabled: true
       Line Style:
-        Line Width: 0.03
+        Line Width: 0.029999999329447746
         Value: Lines
+      Name: Grid
       Normal Cell Count: 0
       Offset:
         X: 0
@@ -33,116 +32,261 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 20
       Reference Frame: world
-
-    # ── Robot Model ────────────────────────────────────────────────────────────
-    - Class: rviz_default_plugins/RobotModel
-      Name: RobotModel
-      Enabled: true
-      Description Topic: /robot_description
-      Visual Enabled: true
+      Value: true
+    - Alpha: 0.800000011920929
+      Class: rviz_default_plugins/RobotModel
       Collision Enabled: false
-      Alpha: 0.8
-
-    # ── TF ─────────────────────────────────────────────────────────────────────
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_footprint:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gripper:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        gripper_grasp_frame:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        imu_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        intel_realsense:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        laser:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        left_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        link_eef:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        right_finger:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        xarm_base:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        zed_camera_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: RobotModel
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
     - Class: rviz_default_plugins/TF
-      Name: TF
       Enabled: false
-      Marker Scale: 0.3
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+      Marker Scale: 0.30000001192092896
+      Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: true
-
-    # ── Detected object markers (spheres + labels + arrows) ───────────────────
+      Tree:
+        {}
+      Update Interval: 0
+      Value: false
     - Class: rviz_default_plugins/MarkerArray
-      Name: Detections
       Enabled: true
+      Name: Detections
+      Namespaces:
+        approach: true
+        labels: true
+        objects: true
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /vision/markers
-      Namespaces:
-        objects: true
-        labels: true
-        approach: true
-
-    # ── Best object pose (green arrow) ────────────────────────────────────────
-    - Class: rviz_default_plugins/Pose
-      Name: BestObject
+      Value: true
+    - Alpha: 1
+      Axes Length: 0.10000000149011612
+      Axes Radius: 0.009999999776482582
+      Class: rviz_default_plugins/Pose
+      Color: 0; 220; 0
       Enabled: true
+      Head Length: 0.05000000074505806
+      Head Radius: 0.019999999552965164
+      Name: BestObject
+      Shaft Length: 0.10000000149011612
+      Shaft Radius: 0.009999999776482582
+      Shape: Arrow
       Topic:
         Depth: 2
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /vision/best_object
-      Shape: Arrow
-      Color: 0; 220; 0
-      Axes Length: 0.1
-      Axes Radius: 0.01
-      Head Length: 0.05
-      Head Radius: 0.02
-      Shaft Length: 0.1
-      Shaft Radius: 0.01
-
-    # ── RGB camera image ──────────────────────────────────────────────────────
+      Value: true
     - Class: rviz_default_plugins/Image
+      Enabled: false
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
       Name: RGB Camera
-      Enabled: true
+      Normalize Range: true
       Topic:
         Depth: 2
+        Durability Policy: Volatile
+        History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /camera/color/image_raw
-      Queue Size: 2
-
-    # ── Debug image (detections overlaid) ─────────────────────────────────────
+      Value: false
     - Class: rviz_default_plugins/Image
+      Enabled: false
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
       Name: Debug Vision
-      Enabled: true
+      Normalize Range: true
       Topic:
         Depth: 2
+        Durability Policy: Volatile
+        History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /vision/debug_image
-      Queue Size: 2
-
-    # ── Depth image ────────────────────────────────────────────────────────────
+      Value: false
     - Class: rviz_default_plugins/Image
+      Enabled: false
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
       Name: Depth
-      Enabled: true
+      Normalize Range: true
       Topic:
         Depth: 2
+        Durability Policy: Volatile
+        History Policy: Keep Last
         Reliability Policy: Best Effort
         Value: /camera/aligned_depth/image_raw
-      Queue Size: 2
-
+      Value: false
+  Enabled: true
   Global Options:
     Background Color: 30; 30; 30
     Fixed Frame: world
     Frame Rate: 30
-
+  Name: root
   Tools:
     - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
     - Class: rviz_default_plugins/MoveCamera
     - Class: rviz_default_plugins/Select
-
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 1.4
+      Distance: 1.399999976158142
       Enable Stereo Rendering:
-        Stereo Eye Separation: 0.06
+        Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.2
+        X: 0.20000000298023224
         Y: 0
-        Z: 0.3
+        Z: 0.30000001192092896
       Focal Shape Fixed Size: true
-      Focal Shape Size: 0.05
+      Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
-      Near Clip Distance: 0.01
-      Pitch: 0.45
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.6700001358985901
       Target Frame: world
       Value: Orbit (rviz)
-      Yaw: 0.85
+      Yaw: 1.2699999809265137
+    Saved: ~
+Window Geometry:
+  Debug Vision:
+    collapsed: false
+  Depth:
+    collapsed: false
+  Displays:
+    collapsed: false
+  Height: 1216
+  Hide Left Dock: false
+  Hide Right Dock: false
+  QMainWindow State: 000000ff00000000fd00000001000000000000014000000466fc0200000005fb0000000a00440065007000740068000000003d000001730000002800fffffffb000000180044006500620075006700200056006900730069006f006e00000001b6000001740000002800fffffffb00000014005200470042002000430061006d0065007200610000000330000001730000002800fffffffb000000100044006900730070006c0061007900730000000160000001c8000000c900fffffffb0000000a00560069006500770073000000022300000280000000a400ffffff000008000000046600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  RGB Camera:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 2048
+  X: 0
+  Y: 27
